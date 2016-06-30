@@ -13,6 +13,8 @@
 		2A38D8741CF2A99F00846741 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2A38D8721CF2A99F00846741 /* Main.storyboard */; };
 		2A38D8761CF2A99F00846741 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2A38D8751CF2A99F00846741 /* Assets.xcassets */; };
 		2A38D8791CF2A99F00846741 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2A38D8771CF2A99F00846741 /* LaunchScreen.storyboard */; };
+		2ABE56F41D250565001BAACA /* CentralManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 2ABE56F31D250565001BAACA /* CentralManager.m */; };
+		2ABE56FA1D2512EE001BAACA /* CustomPeripheral.m in Sources */ = {isa = PBXBuildFile; fileRef = 2ABE56F91D2512EE001BAACA /* CustomPeripheral.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +28,10 @@
 		2A38D8751CF2A99F00846741 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2A38D8781CF2A99F00846741 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2A38D87A1CF2A99F00846741 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2ABE56F21D250565001BAACA /* CentralManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CentralManager.h; sourceTree = "<group>"; };
+		2ABE56F31D250565001BAACA /* CentralManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CentralManager.m; sourceTree = "<group>"; };
+		2ABE56F81D2512EE001BAACA /* CustomPeripheral.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomPeripheral.h; sourceTree = "<group>"; };
+		2ABE56F91D2512EE001BAACA /* CustomPeripheral.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomPeripheral.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +68,10 @@
 				2A38D86D1CF2A99F00846741 /* AppDelegate.m */,
 				2A38D86F1CF2A99F00846741 /* ViewController.h */,
 				2A38D8701CF2A99F00846741 /* ViewController.m */,
+				2ABE56F21D250565001BAACA /* CentralManager.h */,
+				2ABE56F31D250565001BAACA /* CentralManager.m */,
+				2ABE56F81D2512EE001BAACA /* CustomPeripheral.h */,
+				2ABE56F91D2512EE001BAACA /* CustomPeripheral.m */,
 				2A38D8721CF2A99F00846741 /* Main.storyboard */,
 				2A38D8751CF2A99F00846741 /* Assets.xcassets */,
 				2A38D8771CF2A99F00846741 /* LaunchScreen.storyboard */,
@@ -149,9 +159,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2ABE56FA1D2512EE001BAACA /* CustomPeripheral.m in Sources */,
 				2A38D8711CF2A99F00846741 /* ViewController.m in Sources */,
 				2A38D86E1CF2A99F00846741 /* AppDelegate.m in Sources */,
 				2A38D86B1CF2A99F00846741 /* main.m in Sources */,
+				2ABE56F41D250565001BAACA /* CentralManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -304,6 +316,7 @@
 				2A38D87F1CF2A99F00846741 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

@@ -19,13 +19,18 @@
 
 @property (nonatomic, strong) CBPeripheral *currentPeripheral;
 
+@property (nonatomic, strong) UIView *redView;
+
+@property (nonatomic, strong) NSUUID *currentPeripheralUUID;
 
 @end
 
 @implementation ViewController
 - (IBAction)searchPeripheralsAction:(UIButton *)sender {
     NSLog(@"开始扫描");
-    [self.centralManager scanForPeripheralsWithServices:nil options:nil];
+//    NSArray *uuids = @[[CBUUID UUIDWithString:@"AEB128A8-7D3B-809D-D97F-6699428FF0F3"]];
+    NSArray *uuids = @[[CBUUID UUIDWithString:@"FFF0"]];
+    [self.centralManager scanForPeripheralsWithServices:uuids options:nil];
 }
 
 #pragma marak cbperipheral delegate
@@ -48,14 +53,36 @@
         if ([characteristic.UUID isEqual:uuid]) {
             [peripheral setNotifyValue:YES forCharacteristic:characteristic];
         }
-        
-        
+    
     }
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 {
-    NSLog(@"receive message:\n%@",characteristic);
+    NSData *data = characteristic.value;
+    NSString *value4 = [self hexStringFromData:data];
+    NSInteger num = value4.integerValue;
+    switch (num) {
+        case 11:
+            
+            _redView.frame = CGRectMake(_redView.frame.origin.x, _redView.frame.origin.y - 10, 100, 100);
+            
+            break;
+        case 21:
+            _redView.frame = CGRectMake(_redView.frame.origin.x, _redView.frame.origin.y + 10, 100, 100);
+            break;
+        case 31:
+            _redView.frame = CGRectMake(_redView.frame.origin.x - 10, _redView.frame.origin.y, 100, 100);
+            break;
+        case 41:
+            _redView.frame = CGRectMake(_redView.frame.origin.x + 10, _redView.frame.origin.y, 100, 100);
+            break;
+            
+        default:
+            _redView.center = self.view.center;
+            break;
+    }
+    
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForDescriptor:(CBDescriptor *)descriptor error:(NSError *)error
@@ -67,16 +94,45 @@
 #pragma mark cbcentralmanager delegate
 - (void)centralManagerDidUpdateState:(CBCentralManager *)central
 {
-    NSLog(@"peripheral ---- %@",central);
+    
+    switch (central.state) {
+        case CBCentralManagerStateUnknown:
+            NSLog(@"CBCentralManagerStateUnknown");
+            break;
+        case CBCentralManagerStateResetting:
+            NSLog(@"CBCentralManagerStateResetting");
+            break;
+        case CBCentralManagerStateUnsupported:
+            NSLog(@"CBCentralManagerStateUnsupported");
+            break;
+        case CBCentralManagerStateUnauthorized:
+            NSLog(@"CBCentralManagerStateUnauthorized");
+            break;
+        case CBCentralManagerStatePoweredOff:
+            NSLog(@"蓝牙关闭状态--- CBCentralManagerStatePoweredOff");
+            break;
+        case CBCentralManagerStatePoweredOn:
+            NSLog(@"开始扫描---CBCentralManagerStatePoweredOn");
+            
+        {
+            NSArray *uuids = @[[CBUUID UUIDWithString:@"FFF0"]];
+            [self.centralManager scanForPeripheralsWithServices:uuids options:nil];
+        }
+            
+            break;
+            
+        default:
+            break;
+    }
 }
 
+#pragma mark CBCentralManagerDelegate
 - (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary<NSString *,id> *)advertisementData RSSI:(NSNumber *)RSSI
 {
     NSData *data = [advertisementData objectForKey:@"kCBAdvDataManufacturerData"];
     const char *cstring = [[data description] cStringUsingEncoding:NSUTF8StringEncoding];
-    NSString *str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    
-    NSLog(@"name:%@-----广播内容:%@\n%s",peripheral.name, advertisementData, cstring);
+//    NSLog(@"name:%@---功率:%@--广播内容:%@\n%s",peripheral.name, RSSI,advertisementData, cstring);
+    NSLog(@"name:%@",peripheral.name);
     if (![self.periphersArray containsObject:peripheral]) {
         peripheral.delegate = self;
         [self.periphersArray addObject:peripheral];
@@ -86,10 +142,32 @@
 
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral
 {
-    NSLog(@"did connect peripheral:\n%@",peripheral);
+    
+    NSLog(@"did connect peripheral uuid:\n%@",peripheral.identifier);
+    self.currentPeripheralUUID = peripheral.identifier;
     [self.centralManager stopScan];
     [peripheral discoverServices:nil];
     
+}
+
+- (void)centralManager:(CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error
+{
+    NSLog(@"did fail to connect peripheral:%@",error.localizedDescription);
+}
+
+- (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error
+{
+    NSLog(@"已经断开连接,开始尝试恢复连接:did disconnect peripheral :%@",error.localizedDescription);
+
+    
+    [self.centralManager connectPeripheral:self.currentPeripheral options:nil];
+
+}
+
+
+- (void)centralManager:(CBCentralManager *)central willRestoreState:(NSDictionary<NSString *,id> *)dict
+{
+    NSLog(@"will restore state:%@",dict);
 }
 
 #pragma mark uitableview datasource
@@ -114,17 +192,22 @@ static NSString *IDENTIFY = @"identif";
 #pragma mark uitableview delegate
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    [self.centralManager stopScan];
     CBPeripheral *peripheral = self.periphersArray[indexPath.row];
     NSLog(@"did select peripheral:\n%@",peripheral.name);
     self.currentPeripheral = peripheral;
     NSLog(@"开始连接");
+    
     [self.centralManager connectPeripheral:peripheral options:nil];
 }
 
 #pragma life circle
 - (void)initializeView
 {
-    
+    _redView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+    _redView.center = self.view.center;
+    _redView.backgroundColor = [UIColor redColor];
+    [self.view addSubview:_redView];
 }
 
 - (void)initializeDatasource
@@ -141,6 +224,7 @@ static NSString *IDENTIFY = @"identif";
 
 
 #pragma mark get
+
 - (NSMutableArray *)periphersArray
 {
     if (!_periphersArray) {
@@ -152,7 +236,7 @@ static NSString *IDENTIFY = @"identif";
 - (CBCentralManager *)centralManager
 {
     if (!_centralManager) {
-        _centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:nil options:nil];
+        _centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:nil options:@{CBCentralManagerOptionRestoreIdentifierKey:@"centamlManagerIdentify"}];
     }
     return _centralManager;
 }
@@ -164,5 +248,17 @@ static NSString *IDENTIFY = @"identif";
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+
+
+- (NSString *)hexStringFromData:(NSData*)data{
+    return [[[[NSString stringWithFormat:@"%@",data]
+              stringByReplacingOccurrencesOfString: @"<" withString: @""]
+             stringByReplacingOccurrencesOfString: @">" withString: @""]
+            stringByReplacingOccurrencesOfString: @" " withString: @""];
+}
+
+
+
 
 @end
