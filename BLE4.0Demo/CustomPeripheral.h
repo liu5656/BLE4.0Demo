@@ -13,8 +13,17 @@
 @class CBService;
 @class CBCharacteristic;
 
+typedef NS_ENUM(NSInteger, pressButtonType) {
+    pressButtonTypeUnknown = -1,
+    pressButtonTypeSingleUp = 0,
+    pressButtonTypeSingleLeft,
+    pressButtonTypeSingleDown,
+    pressButtonTypeSingleRight
+};
+
 typedef void(^PeripheralDiscoverServerCompletion)(NSError *error, NSArray *servers);
 typedef void(^PeripheralDiscoverCharacteristicCompletion)(NSError *error, NSArray *characteristics);
+typedef void(^characteristicValueChangeBlock)(NSError *error, pressButtonType type,CBCharacteristic *characteristic);
 
 @interface CustomPeripheral : NSObject
 
@@ -22,11 +31,13 @@ typedef void(^PeripheralDiscoverCharacteristicCompletion)(NSError *error, NSArra
 @property (nonatomic, strong) NSDictionary *advertisementData;
 @property (nonatomic, strong) CBPeripheral *peripheral;
 
+
 // 扫描
 - (void)discoverServices:(NSArray<CBUUID *> *)serviceUUIDs onFinish:(PeripheralDiscoverServerCompletion)completion;
 - (void)discoverCharacteristics:(NSArray *)characteristicUUIDs forService:(CBService *)service onFinish:(PeripheralDiscoverCharacteristicCompletion)completion;
 
 // notify
-- (void)setNotifyValue:(BOOL)enabled forCharacteristic:(CBCharacteristic *)characteristic;
+- (void)setNotifyValue:(BOOL)enabled forCharacteristic:(CBCharacteristic *)characteristic whileValueChangedBlock:(characteristicValueChangeBlock)valueChangeBlock;
+
 
 @end

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="gWc-NS-k4R">
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
@@ -25,7 +25,7 @@
                                     <action selector="searchPeripheralsAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="vxw-g6-bHy"/>
                                 </connections>
                             </button>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="c3R-cx-2Ba">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="c3R-cx-2Ba">
                                 <rect key="frame" x="0.0" y="148" width="600" height="343"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <connections>
@@ -42,13 +42,66 @@
                             <constraint firstItem="c3R-cx-2Ba" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-20" id="v65-ah-ZQb"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="sMj-UI-RdB">
+                        <barButtonItem key="rightBarButtonItem" title="Item" id="qyB-1A-tKC">
+                            <connections>
+                                <segue destination="HPn-RM-Wo8" kind="push" id="dUb-EG-ecb"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="peripherTableView" destination="c3R-cx-2Ba" id="YZB-yP-Qbl"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="435" y="418"/>
+            <point key="canvasLocation" x="1010" y="420"/>
+        </scene>
+        <!--View Controller2-->
+        <scene sceneID="TvK-k6-fVp">
+            <objects>
+                <viewController id="HPn-RM-Wo8" customClass="ViewController2" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="VcY-Ce-O0a"/>
+                        <viewControllerLayoutGuide type="bottom" id="PwP-dT-ryY"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="4CN-5R-GOy">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GR4-My-iPp">
+                                <rect key="frame" x="52" y="117" width="46" height="30"/>
+                                <state key="normal" title="Button"/>
+                                <connections>
+                                    <action selector="connectAction:" destination="HPn-RM-Wo8" eventType="touchUpInside" id="2yZ-ad-E8O"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="cH8-8u-Sab"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Rth-da-s5y" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1676" y="420"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="hWw-bK-7nd">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="gWc-NS-k4R" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="bJP-QW-knq">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="P8Y-cl-CJr"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="0Bh-E9-rvL" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="198" y="420"/>
         </scene>
     </scenes>
 </document>

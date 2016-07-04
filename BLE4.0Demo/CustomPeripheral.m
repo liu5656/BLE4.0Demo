@@ -13,6 +13,7 @@
 
 @property (nonatomic, copy) PeripheralDiscoverServerCompletion serverCompletion;
 @property (nonatomic, copy) PeripheralDiscoverCharacteristicCompletion characteristicCompletion;
+@property (nonatomic, copy) characteristicValueChangeBlock valueChangeBlock;
 
 @end
 
@@ -25,6 +26,7 @@
     self.peripheral.delegate = self;
     [self.peripheral discoverServices:serviceUUIDs];
     _serverCompletion = completion;
+    
 }
 
 - (void)discoverCharacteristics:(NSArray *)characteristicUUIDs forService:(CBService *)service onFinish:(PeripheralDiscoverCharacteristicCompletion)completion
@@ -34,14 +36,16 @@
 }
 
 // notify
-- (void)setNotifyValue:(BOOL)enabled forCharacteristic:(CBCharacteristic *)characteristic
+- (void)setNotifyValue:(BOOL)enabled forCharacteristic:(CBCharacteristic *)characteristic whileValueChangedBlock:(characteristicValueChangeBlock)valueChangeBlock
 {
+    _valueChangeBlock = valueChangeBlock;
     [self.peripheral setNotifyValue:enabled forCharacteristic:characteristic];
 }
 
 #pragma mark CBPeripheralDelegate
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error
 {
+//    NSLog(@"did diddiscover servers");
     _serverCompletion(error, peripheral.services);
 }
 
@@ -52,22 +56,31 @@
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 {
+    
     NSData *data = characteristic.value;
     NSString *value4 = [self hexStringFromData:data];
     NSInteger num = value4.integerValue;
+    pressButtonType type = pressButtonTypeUnknown;
     switch (num) {
         case 11:
+            type = pressButtonTypeSingleUp;
             break;
         case 21:
+            type = pressButtonTypeSingleLeft;
             break;
         case 31:
+            type = pressButtonTypeSingleDown;
             break;
         case 41:
+            type = pressButtonTypeSingleRight;
             break;
         default:
             break;
     }
+    _valueChangeBlock(error,type , characteristic);
+    
 }
+
 
 - (NSString *)hexStringFromData:(NSData*)data{
     return [[[[NSString stringWithFormat:@"%@",data]

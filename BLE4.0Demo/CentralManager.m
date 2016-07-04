@@ -10,6 +10,7 @@
 #import "CustomPeripheral.h"
 #import <CoreBluetooth/CoreBluetooth.h>
 
+
 @interface CentralManager()<CBCentralManagerDelegate>
 
 @property (nonatomic, strong) CBCentralManager *centralManager;
@@ -37,6 +38,8 @@
 // 扫描
 - (void)scanPeripheralsByServices:(NSArray<CBUUID *> *)serviceUUIDs options:(NSDictionary *)options completion:(CentralScanPeripheralCompletion)scanCompletion
 {
+    [self.centralManager state];
+    [self peripheralsArray];
     if (self.centralManager.state != CBCentralManagerStatePoweredOn) {
         NSError *error = [[NSError alloc] initWithDomain:@"请打开蓝牙" code:0 userInfo:nil];
         scanCompletion(nil, error);
@@ -57,7 +60,6 @@
 {
     [self.centralManager connectPeripheral:peripheral.peripheral options:options];
     _connectCompletion = connectCompletion;
-//    peripheral
 }
 
 - (void)canclePeripheralConnect:(CustomPeripheral *)peripheral completion:(NSError *)error
@@ -96,50 +98,65 @@
 }
 
 #pragma mark CBCentralManagerDelegate
+// scan scope
 - (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary<NSString *,id> *)advertisementData RSSI:(NSNumber *)RSSI
 {
+    if ([self.peripheralsArray containsObject:peripheral]) {
+        return;
+    }
+    
     CustomPeripheral *customPeripheral = [[CustomPeripheral alloc] init];
     customPeripheral.peripheral = peripheral;
     customPeripheral.RSSI = RSSI;
     customPeripheral.advertisementData = advertisementData;
+    [self.peripheralsArray addObject:customPeripheral];
+    _scanCompletion(customPeripheral, nil);
+    
 }
 
+// connect scope
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral
 {
-    
-    NSLog(@"did connect peripheral uuid:\n%@",peripheral.identifier);
-//    self.currentPeripheralUUID = peripheral.identifier;
-//    [self.centralManager stopScan];
-//    [peripheral discoverServices:nil];
+    CustomPeripheral *tempPeripheral = [[CustomPeripheral alloc] init];
+    tempPeripheral.peripheral = peripheral;
+    _connectCompletion(tempPeripheral, nil);
     
 }
 
 - (void)centralManager:(CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error
 {
     NSLog(@"did fail to connect peripheral:%@",error.localizedDescription);
+    _connectCompletion(nil, error);
 }
 
 - (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error
 {
     NSLog(@"已经断开连接,开始尝试恢复连接:did disconnect peripheral :%@",error.localizedDescription);
-//    [self.centralManager connectPeripheral:self.currentPeripheral options:nil];
-    
+    [self.centralManager connectPeripheral:peripheral options:nil];
+    _connectCompletion(nil, error);
 }
 
-
+    // reconnect scope
 - (void)centralManager:(CBCentralManager *)central willRestoreState:(NSDictionary<NSString *,id> *)dict
 {
     NSLog(@"will restore state:%@",dict);
 }
 
 #pragma mark get
-- (NSMutableArray *)peripheralArray
+//- (NSMutableArray *)peripheralArray
+//{
+//    if (!_peripheralsArray) {
+//        _peripheralsArray = [NSMutableArray array];
+//    }
+//    return _peripheralsArray;
+//}
+
+- (NSMutableArray *)peripheralsArray
 {
     if (!_peripheralsArray) {
         _peripheralsArray = [NSMutableArray array];
     }
     return _peripheralsArray;
 }
-
 
 @end

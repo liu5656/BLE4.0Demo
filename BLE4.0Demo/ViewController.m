@@ -28,9 +28,9 @@
 @implementation ViewController
 - (IBAction)searchPeripheralsAction:(UIButton *)sender {
     NSLog(@"开始扫描");
-//    NSArray *uuids = @[[CBUUID UUIDWithString:@"AEB128A8-7D3B-809D-D97F-6699428FF0F3"]];
     NSArray *uuids = @[[CBUUID UUIDWithString:@"FFF0"]];
     [self.centralManager scanForPeripheralsWithServices:uuids options:nil];
+    
 }
 
 #pragma marak cbperipheral delegate
@@ -218,8 +218,8 @@ static NSString *IDENTIFY = @"identif";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self initializeView];
-    [self initializeDatasource];
+//    [self initializeView];
+//    [self initializeDatasource];
 }
 
 
