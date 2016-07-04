@@ -21,9 +21,9 @@ typedef NS_ENUM(NSInteger, pressButtonType) {
     pressButtonTypeSingleRight
 };
 
-typedef void(^PeripheralDiscoverServerCompletion)(NSError *error, NSArray *servers);
-typedef void(^PeripheralDiscoverCharacteristicCompletion)(NSError *error, NSArray *characteristics);
 typedef void(^characteristicValueChangeBlock)(NSError *error, pressButtonType type,CBCharacteristic *characteristic);
+typedef void(^discoverServerCompletion)(NSError *error, CBService *server);
+typedef void(^discoverCharacteristicCompletion)(NSError *error, CBCharacteristic *characteristic);
 
 @interface CustomPeripheral : NSObject
 
@@ -33,11 +33,10 @@ typedef void(^characteristicValueChangeBlock)(NSError *error, pressButtonType ty
 
 
 // 扫描
-- (void)discoverServices:(NSArray<CBUUID *> *)serviceUUIDs onFinish:(PeripheralDiscoverServerCompletion)completion;
-- (void)discoverCharacteristics:(NSArray *)characteristicUUIDs forService:(CBService *)service onFinish:(PeripheralDiscoverCharacteristicCompletion)completion;
+- (void)discoverService:(CBUUID *)serverUUID completion:(discoverServerCompletion)completion;
+- (void)discoverCharacteristics:(CBUUID *)characteristicUUID forService:(CBService *)service completion:(discoverCharacteristicCompletion)completion;
 
-// notify
-- (void)setNotifyValue:(BOOL)enabled forCharacteristic:(CBCharacteristic *)characteristic whileValueChangedBlock:(characteristicValueChangeBlock)valueChangeBlock;
-
+// 监听
+- (void)observerCharacteristicUUID:(CBUUID *)characteristicUUID whileValueChangedBlock:(characteristicValueChangeBlock)valueChangeBlock;
 
 @end

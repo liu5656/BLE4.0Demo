@@ -11,12 +11,17 @@
 @class CBPeripheral;
 @class CBUUID;
 @class CustomPeripheral;
+@class CBService;
 
 typedef void(^CentralScanPeripheralCompletion)(CustomPeripheral *peripheral, NSError *error);
 typedef void(^CentralconnectPeripheralCompletion)(CustomPeripheral *peripheral, NSError *error);
 
+typedef void(^connectPeripheralCompletion)(CustomPeripheral *peripheral, CBService *server, NSError *error);
+
 
 @interface CentralManager : NSObject
+
+@property (nonatomic, strong) CustomPeripheral *currentConnectedPeripheral;
 
 
 + (instancetype)sharedInstance;
@@ -25,7 +30,7 @@ typedef void(^CentralconnectPeripheralCompletion)(CustomPeripheral *peripheral, 
 - (void)scanPeripheralsByServices:(NSArray<CBUUID *> *)serviceUUIDs options:(NSDictionary *)options completion:(CentralScanPeripheralCompletion)scanCompletion;
 - (void)stopScan;
 
-- (void)connectPeripheralByCustonPreipheral:(CustomPeripheral *)peripheral option:(NSDictionary *)options completion:(CentralconnectPeripheralCompletion)connectCompletion;
 - (void)canclePeripheralConnect:(CustomPeripheral *)peripheral completion:(NSError *)error;
+- (void)connectPeripheralByCustomPreipheral:(CustomPeripheral *)peripheral whichServer:(CBUUID *)serverUUID whichCharacteristic:(CBUUID *)characteristicUUID option:(NSDictionary *)options completion:(connectPeripheralCompletion)connectCompletion;
 
 @end

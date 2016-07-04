@@ -11,14 +11,20 @@
 #import <CoreBluetooth/CoreBluetooth.h>
 
 
-@interface CentralManager()<CBCentralManagerDelegate>
+@interface CentralManager()<CBCentralManagerDelegate, CBPeripheralDelegate>
 
 @property (nonatomic, strong) CBCentralManager *centralManager;
 
 @property (nonatomic, strong) NSMutableArray *peripheralsArray;
 
 @property (nonatomic, copy) CentralScanPeripheralCompletion scanCompletion;
-@property (nonatomic, copy) CentralconnectPeripheralCompletion connectCompletion;
+
+
+@property (nonatomic, copy) connectPeripheralCompletion connectConpletion;
+
+
+@property (nonatomic, strong) CBUUID *serverUUID;
+@property (nonatomic, strong) CBUUID *characteristicUUID;
 
 
 @end
@@ -49,18 +55,20 @@
     _scanCompletion = scanCompletion;
 }
 
-
 - (void)stopScan
 {
     [self.centralManager stopScan];
 }
 
 // 连接
-- (void)connectPeripheralByCustonPreipheral:(CustomPeripheral *)peripheral option:(NSDictionary *)options completion:(CentralconnectPeripheralCompletion)connectCompletion
+- (void)connectPeripheralByCustomPreipheral:(CustomPeripheral *)peripheral whichServer:(CBUUID *)serverUUID whichCharacteristic:(CBUUID *)characteristicUUID option:(NSDictionary *)options completion:(connectPeripheralCompletion)connectCompletion
 {
+    self.serverUUID = serverUUID;
+    self.characteristicUUID = characteristicUUID;
+    _connectConpletion = connectCompletion;
     [self.centralManager connectPeripheral:peripheral.peripheral options:options];
-    _connectCompletion = connectCompletion;
 }
+
 
 - (void)canclePeripheralConnect:(CustomPeripheral *)peripheral completion:(NSError *)error
 {
@@ -117,23 +125,34 @@
 // connect scope
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral
 {
-    CustomPeripheral *tempPeripheral = [[CustomPeripheral alloc] init];
-    tempPeripheral.peripheral = peripheral;
-    _connectCompletion(tempPeripheral, nil);
-    
+
+    CustomPeripheral *temp = self.currentConnectedPeripheral;
+    temp.peripheral = peripheral;
+    self.currentConnectedPeripheral = temp;
+    [temp discoverService:self.serverUUID completion:^(NSError *error, CBService *server) {
+        if (!error) {
+            [temp discoverCharacteristics:self.characteristicUUID forService:server completion:^(NSError *error, CBCharacteristic *characteristic) {
+                if (!error) {
+                    [temp.peripheral setNotifyValue:YES forCharacteristic:characteristic];
+                    NSLog(@"订阅特征完成");
+                }
+            }];
+        }
+    }];
 }
+
 
 - (void)centralManager:(CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error
 {
     NSLog(@"did fail to connect peripheral:%@",error.localizedDescription);
-    _connectCompletion(nil, error);
+    _connectConpletion(nil, nil, error);
 }
 
 - (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error
 {
     NSLog(@"已经断开连接,开始尝试恢复连接:did disconnect peripheral :%@",error.localizedDescription);
     [self.centralManager connectPeripheral:peripheral options:nil];
-    _connectCompletion(nil, error);
+    _connectConpletion(nil, nil, error);
 }
 
     // reconnect scope
@@ -142,15 +161,39 @@
     NSLog(@"will restore state:%@",dict);
 }
 
-#pragma mark get
-//- (NSMutableArray *)peripheralArray
-//{
-//    if (!_peripheralsArray) {
-//        _peripheralsArray = [NSMutableArray array];
-//    }
-//    return _peripheralsArray;
-//}
+#pragma mark CBPeripheralDelegate
+- (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error
+{
+    if (peripheral.services.count == 0) {
+        NSError *error = [NSError errorWithDomain:@"没有找到相应server" code:0 userInfo:nil];
+        _connectConpletion(nil, nil, error);
+        return;
+    }
+    [peripheral discoverCharacteristics:@[self.characteristicUUID] forService:peripheral.services.firstObject];
+}
 
+
+- (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error
+{
+    if (service.characteristics.count == 0) {
+        NSError *error = [NSError errorWithDomain:@"没有找到相应characteristic" code:0 userInfo:nil];
+        _connectConpletion(nil, nil, error);
+        return;
+    }
+    
+    for (CBCharacteristic *temp in service.characteristics) {
+        if ([temp.UUID isEqual:self.characteristicUUID]) {
+            [peripheral setNotifyValue:YES forCharacteristic:temp]; // 订阅
+        }
+    }
+    
+    CustomPeripheral *temp = [[CustomPeripheral alloc] init];
+    temp.peripheral = peripheral;
+    _connectConpletion(temp, service, nil);
+}
+
+
+#pragma mark get
 - (NSMutableArray *)peripheralsArray
 {
     if (!_peripheralsArray) {

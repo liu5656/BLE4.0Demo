@@ -11,47 +11,45 @@
 
 @interface CustomPeripheral()<CBPeripheralDelegate>
 
-@property (nonatomic, copy) PeripheralDiscoverServerCompletion serverCompletion;
-@property (nonatomic, copy) PeripheralDiscoverCharacteristicCompletion characteristicCompletion;
 @property (nonatomic, copy) characteristicValueChangeBlock valueChangeBlock;
+@property (nonatomic, copy) discoverServerCompletion serverCompletion;
+@property (nonatomic, copy) discoverCharacteristicCompletion characteristicCompletion;
+
 
 @end
 
 @implementation CustomPeripheral
 
 
-// 扫描
-- (void)discoverServices:(NSArray<CBUUID *> *)serviceUUIDs onFinish:(PeripheralDiscoverServerCompletion)completion
+- (void)discoverService:(CBUUID *)serverUUID completion:(discoverServerCompletion)completion
 {
     self.peripheral.delegate = self;
-    [self.peripheral discoverServices:serviceUUIDs];
+    [self.peripheral discoverServices:@[serverUUID]];
     _serverCompletion = completion;
-    
 }
 
-- (void)discoverCharacteristics:(NSArray *)characteristicUUIDs forService:(CBService *)service onFinish:(PeripheralDiscoverCharacteristicCompletion)completion
+- (void)discoverCharacteristics:(CBUUID *)characteristicUUID forService:(CBService *)service completion:(discoverCharacteristicCompletion)completion
 {
-    [self.peripheral discoverCharacteristics:characteristicUUIDs forService:service];
+    [self.peripheral discoverCharacteristics:@[characteristicUUID] forService:service];
     _characteristicCompletion = completion;
 }
 
+
 // notify
-- (void)setNotifyValue:(BOOL)enabled forCharacteristic:(CBCharacteristic *)characteristic whileValueChangedBlock:(characteristicValueChangeBlock)valueChangeBlock
+- (void)observerCharacteristicUUID:(CBUUID *)characteristicUUID whileValueChangedBlock:(characteristicValueChangeBlock)valueChangeBlock
 {
     _valueChangeBlock = valueChangeBlock;
-    [self.peripheral setNotifyValue:enabled forCharacteristic:characteristic];
 }
 
 #pragma mark CBPeripheralDelegate
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error
 {
-//    NSLog(@"did diddiscover servers");
-    _serverCompletion(error, peripheral.services);
+    _serverCompletion(error, peripheral.services.firstObject);
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error
 {
-    _characteristicCompletion(error, service.characteristics);
+    _characteristicCompletion(error, service.characteristics.firstObject);
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
@@ -77,7 +75,7 @@
         default:
             break;
     }
-    _valueChangeBlock(error,type , characteristic);
+    _valueChangeBlock(error, type, characteristic);
     
 }
 
