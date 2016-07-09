@@ -39,6 +39,7 @@
 - (void)observerCharacteristicUUID:(CBUUID *)characteristicUUID whileValueChangedBlock:(characteristicValueChangeBlock)valueChangeBlock
 {
     _valueChangeBlock = valueChangeBlock;
+    
 }
 
 #pragma mark CBPeripheralDelegate

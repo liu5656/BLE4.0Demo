@@ -44,15 +44,15 @@
 // 扫描
 - (void)scanPeripheralsByServices:(NSArray<CBUUID *> *)serviceUUIDs options:(NSDictionary *)options completion:(CentralScanPeripheralCompletion)scanCompletion
 {
-    [self.centralManager state];
     [self peripheralsArray];
+    _scanCompletion = scanCompletion;
     if (self.centralManager.state != CBCentralManagerStatePoweredOn) {
         NSError *error = [[NSError alloc] initWithDomain:@"请打开蓝牙" code:0 userInfo:nil];
         scanCompletion(nil, error);
         return;
     }
     [self.centralManager scanForPeripheralsWithServices:serviceUUIDs options:options];
-    _scanCompletion = scanCompletion;
+    
 }
 
 - (void)stopScan
@@ -98,6 +98,10 @@
             break;
         case CBCentralManagerStatePoweredOn:
             NSLog(@"开始扫描---CBCentralManagerStatePoweredOn");
+        {
+            NSArray *array = @[[CBUUID UUIDWithString:@"FFF0"]];
+            [self scanPeripheralsByServices:array options:nil completion:_scanCompletion];
+        }
             break;
             
         default:
@@ -109,7 +113,7 @@
 // scan scope
 - (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary<NSString *,id> *)advertisementData RSSI:(NSNumber *)RSSI
 {
-    if ([self.peripheralsArray containsObject:peripheral]) {
+    if ([self.peripheralsArray containsObject:peripheral] || ![peripheral.name isEqualToString:@"FSRKB-MXK-01"]) {
         return;
     }
     
@@ -140,7 +144,6 @@
         }
     }];
 }
-
 
 - (void)centralManager:(CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error
 {
