@@ -25,10 +25,17 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uuS-rK-BFe">
-                                <rect key="frame" x="21" y="108" width="46" height="30"/>
-                                <state key="normal" title="Button"/>
+                                <rect key="frame" x="24" y="108" width="41" height="30"/>
+                                <state key="normal" title="single"/>
                                 <connections>
-                                    <action selector="connectAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="gkR-tA-aGt"/>
+                                    <action selector="connectSinglePeripheralAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="vTo-EJ-fXq"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Smz-49-3Jg">
+                                <rect key="frame" x="13" y="183" width="60" height="30"/>
+                                <state key="normal" title="multpitle"/>
+                                <connections>
+                                    <action selector="connectMultiplePeripheralAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="NdP-Sv-58T"/>
                                 </connections>
                             </button>
                         </subviews>

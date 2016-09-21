@@ -76,6 +76,9 @@
         default:
             break;
     }
+    if (!_valueChangeBlock) {
+        return;
+    }
     _valueChangeBlock(error, type, characteristic);
     
 }

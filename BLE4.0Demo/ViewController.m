@@ -7,6 +7,7 @@
 //
 
 #import "ViewController.h"
+
 #import <CoreBluetooth/CoreBluetooth.h>
 
 
@@ -268,7 +269,7 @@
 @end
 
 @implementation ViewController
-- (IBAction)connectAction:(UIButton *)sender {
+- (IBAction)connectSinglePeripheralAction:(UIButton *)sender {
     
     CBUUID *serverUUID = [CBUUID UUIDWithString:@"FFF0"];
     CBUUID *characteristicUUID = [CBUUID UUIDWithString:@"FFF1"];
@@ -287,6 +288,26 @@
     
 }
 
+- (IBAction)connectMultiplePeripheralAction:(UIButton *)sender {
+    
+//    for (CustomPeripheral *peripheral in self.peripheralsArray) {
+//        CBUUID *serverUUID = [CBUUID UUIDWithString:@"FFF0"];
+//        CBUUID *characteristicUUID = [CBUUID UUIDWithString:@"FFF1"];
+//        [CentralManager sharedInstance].currentConnectedPeripheral = self.peripheralsArray.firstObject;
+//        [[CentralManager sharedInstance] connectPeripheralByCustomPreipheral:self.peripheralsArray.lastObject whichServer:serverUUID whichCharacteristic:characteristicUUID option:nil completion:^(CustomPeripheral *peripheral, CBService *server, NSError *error) {
+//            if (!error) {
+//                NSLog(@"---订阅多个外围设备成功");
+//            }
+//        }];
+//        
+//        [[CentralManager sharedInstance].currentConnectedPeripheral observerCharacteristicUUID:characteristicUUID whileValueChangedBlock:^(NSError *error, pressButtonType type, CBCharacteristic *characteristic) {
+//            if (!error) {
+//                NSLog(@"多个外围设备111111值改变:%@",characteristic.value);
+//            }
+//        }];
+//    }
+}
+
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -299,7 +320,7 @@
             NSLog(@"did discover peripherial %@", peripheral.peripheral.name);
             [self.peripheralsArray addObject:peripheral];
         }else{
-            
+            NSLog(@"搜索错误");
         }
     }];
     

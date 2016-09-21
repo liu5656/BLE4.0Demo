@@ -113,9 +113,9 @@
 // scan scope
 - (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary<NSString *,id> *)advertisementData RSSI:(NSNumber *)RSSI
 {
-    if ([self.peripheralsArray containsObject:peripheral] || ![peripheral.name isEqualToString:@"FSRKB-MXK-01"]) {
-        return;
-    }
+//    if ([self.peripheralsArray containsObject:peripheral]) {
+//        return;
+//    }
     
     CustomPeripheral *customPeripheral = [[CustomPeripheral alloc] init];
     customPeripheral.peripheral = peripheral;
